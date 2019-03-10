@@ -1,0 +1,17 @@
+{
+  "name": "csgn-imhere-server",
+  "version": "1.0.0",
+  "description": "send a pulse to announce your presence",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "georgeg",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1",
+    "nano": "^8.0.0"
+  }
+}
