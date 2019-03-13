@@ -3,17 +3,31 @@ const app = express()
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const http = require('http');
+const cors = require('cors');
 var config = require('./config');
 
 app.use(logger('combined'));
 app.use(bodyParser.json());
+app.use('/static', express.static('static'))
+app.use(cors());
 
-const port = 3000
 const nano = require('nano')(config.couchdb.address);
 
 const imheredb = nano.db.use('imhere');
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class Pulse {
+    constructor( pulsedto ) {
+        this._id = pulsedto._id;
+        this._name = pulsedto._name;
+        this._smoker = pulsedto._smoker;
+        this._room = pulsedto._room;
+    }
+    setRevision(revision) {
+        this._rev = revision;
+    }
+}
 
 app.get('/', (req, resp) => res.send('Hello CSGN - v1.0.0! 👍'))
 
@@ -41,10 +55,20 @@ app.get('/aftereight', function (req, resp) {
     selectUsers(startDate, endDate, resp);
 })
 
+/*
+ "user": {
+    "name": "George Gugulea",
+    "id": "georgeg",
+    "msg": "imhere",
+    "smoker": false,
+
+  }
+*/
 app.post('/imhere', function(req, resp) {
-    console.log(req.body);
+    const pulsejs = req.body;
+    console.log("app.post(): " + pulsejs);
     var now = new Date();
-    const user = req.body;
+
     const doc = {};
     doc.PulseTime = [now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes(), now.getSeconds()];
     // doc.PulseTime = Date();
@@ -57,8 +81,55 @@ app.post('/imhere', function(req, resp) {
 
 
 async function asyncInsertUser(doc) {
-    const result = await imheredb.insert( doc );
-    return result;
+    var user = null;
+    try {
+        user = await imheredb.get(doc.user.id, { rev_infos: true });
+        console.log("image.get(): " + user.toString());
+    }
+    catch(err) {
+        console.log("imhere.get(): error: " + err);
+    }
+
+    var result = null;
+    if(user == null ) {
+        try {
+            result = await imheredb.insert(doc, doc.user.id );
+            console.log("imheredb.insert(): " + result);
+        }
+        catch (err) {
+            console.log("imheredb.insert(): error: " + err);
+        }
+    }
+    else {
+        try {
+            result = await imheredb.insert(doc, { _id: doc.user.id, _rev: user._rev });
+            console.log("imheredb.insert(): " + result);
+        }
+        catch (err) {
+            console.log("imheredb.insert(): error: " + err);
+        }
+ 
+    }
+
+    // imheredb.get(doc.user.id, {rev_infos: true})
+    //         .then( (body) => {
+    //             console.log("imhere get: " + body);
+    //             user = body;
+    //         })
+    //         .then(
+    //         )
+    //         .catch( (err) => {
+    //             console.log("imheredb error: " + err);
+    //             user = null;
+    //         });
+
+
+    // var revision = null;
+    // if( users.size > 0 ) {
+    //     revision = users[0].rev;
+    // }
+    // const result = await imheredb.insert( doc, { _id: doc.user.id, _rev: revision} );
+    // return result;
 }
 
 function selectUsers(startpulse, endpulse, resp) {
@@ -85,5 +156,5 @@ function date_to_array(date) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-http.createServer(app).listen(port);
-// app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+http.createServer(app).listen(config.server.hostport, config.server.hostname);
+
