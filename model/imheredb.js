@@ -63,6 +63,9 @@ class CouchDb {
         this.imheredb.view("orderedUsers", "byPulseTime", { startkey: startpulse, endkey: endpulse, 'include_docs': false })
             .then((body) => {
                 callbk_ok(body.rows);
+            })
+            .catch ((err) => {
+                console.log(`selectUsers: error: ${err}`);
             });
         // function (err, body) {
         //     if (err) console.log(err);
@@ -77,7 +80,11 @@ class CouchDb {
     }
 
     getUser(id, callbk_ok) {
-        this.imheredb.get(id).then( (body) => callbk_ok(body) );
+        this.imheredb.get(id)
+            .then( (body) => callbk_ok(body) )
+            .catch( (err) => {
+                console.log(`getUser: error: ${err}`);
+            });
     }
 }
 

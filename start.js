@@ -88,9 +88,11 @@ app.post('/imhere', function(req, resp) {
 
     pulsejs.PulseTime = date_to_array(now);
 
-    db.addPulse(pulsejs);
+    db.addPulse(pulsejs)
+        .then(() => resp.send("👍"))
+        .catch( (err) => console.log(`post('/imhere') error: ${err}`));
     resp.send("👍");
-})
+});
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
