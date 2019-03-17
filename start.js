@@ -31,7 +31,7 @@ class Pulse {
 app.get('/about/', (req, resp) => res.send('Hello CSGN, imhere - v1.0.0! 👍'))
 
 app.get('/lasth/', function (req, resp) {
-    console.log(`${req.methd} ${req.url}`);
+    console.log(`${req.method} ${req.url}`);
     var lasth = new Date();
     var endDate = date_to_array(lasth);
 
@@ -45,7 +45,7 @@ app.get('/lasth/', function (req, resp) {
 });
 
 app.get('/aftereight/', function (req, resp) {
-    console.log(`${req.methd} ${req.url}`);
+    console.log(`${req.method} ${req.url}`);
 
     var today = new Date();
     var endDate = date_to_array(today);
@@ -91,7 +91,6 @@ app.post('/imhere', function(req, resp) {
     db.addPulse(pulsejs);
     resp.send("👍");
 })
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
