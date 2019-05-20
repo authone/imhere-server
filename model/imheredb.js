@@ -12,7 +12,7 @@ class CouchDb {
         var pulsedb = null;
         try {
             pulsedb = await this.imheredb.get(pulse.id, { rev_infos: true });
-            console.log("image.get(): " + pulsedb.toString());
+            console.log("imheredb.get(): " + pulsedb.toString());
         }
         catch (err) {
             console.log("imhere.get(): error: " + err);
@@ -60,9 +60,13 @@ class CouchDb {
 
     selectUsers(startpulse, endpulse, callbk_ok) {
         // var result = await imheredb.search("orderedUsers", "byPulseTime");
-        this.imheredb.view("orderedUsers", "byPulseTime", { startkey: startpulse, endkey: endpulse, 'include_docs': false })
+        this.imheredb.view("orderedUsers", "byPulseTime", { startkey: startpulse, endkey: endpulse, 'include_docs': true })
             .then((body) => {
-                callbk_ok(body.rows);
+                var pulses = [];
+                body.rows.forEach( row => {
+                    pulses.push(row.doc);
+                });
+                callbk_ok(pulses);
             })
             .catch ((err) => {
                 console.log(`selectUsers: error: ${err}`);
