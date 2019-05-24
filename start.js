@@ -28,7 +28,7 @@ class Pulse {
     }
 }
 
-app.get('/about/', (req, resp) => res.send('Hello CSGN, imhere - v1.0.0! 👍'))
+app.get('/about/', (req, resp) => resp.send('Hello CSGN, imhere - v1.0.0! 👍'))
 
 app.get('/lasth/', function (req, resp) {
     console.log(`${req.method} ${req.url}`);
